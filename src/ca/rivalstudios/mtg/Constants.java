@@ -3,6 +3,9 @@ package ca.rivalstudios.mtg;
 public class Constants {
 	
 	public final static String SERVER_VERSION = "1.0";
+	
+	public final static String X = "px";
+	public final static String Y = "py";
 
 	public static int ERROR = -1;
 	public static int OK = 1;

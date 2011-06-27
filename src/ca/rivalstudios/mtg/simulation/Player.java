@@ -1,5 +1,7 @@
 package ca.rivalstudios.mtg.simulation;
 
+import com.smartfoxserver.v2.entities.User;
+
 public class Player {
 	private String name;
 	private float hp;
@@ -10,8 +12,16 @@ public class Player {
 	private float speed;
 	private int level;
 	private int team;
+	private float x;
+	private float y;
+	
+	private int id = 0;
+	private User sfsUser = null;
 
-	public Player(String name, int team) {
+	public Player(String name, int team, int id, User sfsUser) {
+		this.id = id;
+		this.sfsUser = sfsUser;
+		
 		this.name = name;
 		this.hp = 100.0f;
 		this.xp = 0.0f;
@@ -61,5 +71,25 @@ public class Player {
 	
 	public void addXp(float amount) {
 		xp = xp + amount;
+	}
+	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
+	}
+	
+	public void setX(float x) {
+		this.x = x;
+	}
+	
+	public void setY(float y) {
+		this.y = y;
+	}
+	
+	public User getSfsUser() {
+		return sfsUser;
 	}
 }

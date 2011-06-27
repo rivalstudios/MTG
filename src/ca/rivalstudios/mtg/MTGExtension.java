@@ -4,8 +4,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import ca.rivalstudios.mtg.handlers.AttackHandler;
 import ca.rivalstudios.mtg.handlers.MoveHandler;
-import ca.rivalstudios.mtg.handlers.OnUserDisconnect;
 import ca.rivalstudios.mtg.handlers.ReadyHandler;
+import ca.rivalstudios.mtg.handlers.UserDisconnectHandler;
+import ca.rivalstudios.mtg.handlers.UserJoinHandler;
+import ca.rivalstudios.mtg.handlers.UserLeaveHandler;
+import ca.rivalstudios.mtg.simulation.GameController;
 import ca.rivalstudios.mtg.simulation.World;
 
 import com.smartfoxserver.v2.core.SFSEventType;
@@ -16,6 +19,7 @@ import com.smartfoxserver.v2.extensions.SFSExtension;
 public class MTGExtension extends SFSExtension {
 		
 	private ConcurrentHashMap<Integer, World> games = null;
+	private GameController gameController;
 
 	@Override
 	public void init() {
@@ -23,15 +27,18 @@ public class MTGExtension extends SFSExtension {
 		
 		games = new ConcurrentHashMap<Integer, World>();
 		
+		gameController = new GameController();
+		gameController.start();
+		
 		// Custom Request Handlers
-		// TODO: these strings should be changed to ENUMS or Constants
 		addRequestHandler(Commands.MOVE, MoveHandler.class);
 		addRequestHandler(Commands.READY, ReadyHandler.class);
 		addRequestHandler(Commands.ATTACK, AttackHandler.class);
 		
-		// Server Event Handlers
-		addEventHandler(SFSEventType.USER_DISCONNECT, OnUserDisconnect.class);
-		addEventHandler(SFSEventType.USER_LEAVE_ROOM, OnUserDisconnect.class);
+		addEventHandler(SFSEventType.USER_JOIN_ROOM, UserJoinHandler.class);
+		addEventHandler(SFSEventType.USER_LEAVE_ROOM, UserLeaveHandler.class);
+		addEventHandler(SFSEventType.USER_LOGOUT, UserDisconnectHandler.class);
+		addEventHandler(SFSEventType.USER_DISCONNECT, UserDisconnectHandler.class);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.List;
 import ca.rivalstudios.mtg.Commands;
 import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
+import ca.rivalstudios.mtg.simulation.Player;
 import ca.rivalstudios.mtg.simulation.World;
 
 import com.smartfoxserver.v2.entities.Room;
@@ -29,21 +30,36 @@ public class MoveHandler extends BaseClientRequestHandler {
 		// Get the world simulation
 		World world = ((MTGExtension) (getParentExtension())).getGames().get(room.getId());
 		
-		Player p = 
+		// Get the player
+		Player currPlayer = world.getPlayers().get(user.getId());
 		
+		// Get the player coordinates
+		float px = params.getFloat("x");
+		float py = params.getFloat("y");
 		
-		// Get the client params
-		float x = params.getFloat("x");
-		float y = params.getFloat("y");
-		
-		// TODO: check for valid X, Y
-
-		// Create a response object
-		ISFSObject resObj = SFSObject.newInstance();
-		//resObj.putInt("moveAck", Constant.OK);
-		
-		send("move", resObj, user);
-		// TODO: should send the X,Y to ALL clients
+		if (isValidMove(px, py)) {
+			// Update the player's coordinates
+			currPlayer.setX(px);
+			currPlayer.setY(py);
+	
+			// Send the updates to the opponents
+			ISFSObject resObj = new SFSObject();
+			resObj.putFloat(Constants.X, px);
+			resObj.putFloat(Constants.Y, py);
+			
+			List<User> recipients = room.getUserList();
+			recipients.remove(currPlayer.getSfsUser());
+			
+			send(Commands.MOVE, resObj, recipients);
+		} else {
+			// TODO: Handle invalid move here
+		}
 	}
-
+	
+	/*
+	 * Validate if the players position is a legal move.
+	 */
+	private boolean isValidMove(float x, float y) {
+		return true;
+	}
 }
