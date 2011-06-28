@@ -28,7 +28,7 @@ public class MTGExtension extends SFSExtension {
 		games = new ConcurrentHashMap<Integer, World>();
 		
 		gameController = new GameController();
-		gameController.start();
+		//gameController.start();
 		
 		// Custom Request Handlers
 		addRequestHandler(Commands.MOVE, MoveHandler.class);

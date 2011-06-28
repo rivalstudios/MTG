@@ -15,14 +15,16 @@ public class Player {
 	private float x;
 	private float y;
 	
+	private int gameId = 0;
+	
 	private int id = 0;
 	private User sfsUser = null;
 
-	public Player(String name, int team, int id, User sfsUser) {
+	public Player(int id, User sfsUser) {
 		this.id = id;
 		this.sfsUser = sfsUser;
 		
-		this.name = name;
+		//this.name = name;
 		this.hp = 100.0f;
 		this.xp = 0.0f;
 		this.damage = 5.0f;
@@ -30,7 +32,7 @@ public class Player {
 		this.armour = 1.0f;
 		this.speed = 5.0f;
 		this.level = 1;
-		this.team = team;
+		//this.team = team;
 	}
 	
 	public String getName() {
@@ -91,5 +93,13 @@ public class Player {
 	
 	public User getSfsUser() {
 		return sfsUser;
+	}
+	
+	public void setGameID(int id) {
+		this.gameId = id;
+	}
+	
+	public int getGameID() {
+		return gameId;
 	}
 }

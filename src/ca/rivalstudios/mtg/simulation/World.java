@@ -11,12 +11,16 @@ public class World {
 	private ArrayList<Minion> minions;
 	private ArrayList<Throne> thrones;
 	
-	public World() {
+	private int id = 0;
+	
+	public World(int id) {
 		players = new ConcurrentHashMap<Integer, Player>();
 		bullets = new ArrayList<Bullet>();
 		towers = new ArrayList<Tower>();
 		minions = new ArrayList<Minion>();
 		thrones = new ArrayList<Throne>();
+		
+		this.id = id;
 		
 		reset();
 	}
@@ -27,5 +31,9 @@ public class World {
 	
 	public ConcurrentHashMap<Integer, Player> getPlayers() {
 		return players;
+	}
+	
+	public int getGameID() {
+		return id;
 	}
 }

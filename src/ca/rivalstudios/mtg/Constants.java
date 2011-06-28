@@ -22,4 +22,9 @@ public class Constants {
 	public static int RADIUS_PLAYER = 10;
 	public static int RADIUS_TOWER = 15;
 	public static int RADIUS_THRONE = 20;
+	
+	public static int WORLD_MIN_X = -30;
+	public static int WORLD_MAX_X = 30;
+	public static int WORLD_MIN_Z = -30;
+	public static int WORLD_MAX_Z = 30;
 }

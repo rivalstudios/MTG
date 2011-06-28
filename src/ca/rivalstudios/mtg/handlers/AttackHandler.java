@@ -8,6 +8,7 @@ public class AttackHandler extends BaseClientRequestHandler {
 
 	@Override
 	public void handleClientRequest(User user, ISFSObject params) {
+		trace("Entering AttackHandler.");
 
 	}
 

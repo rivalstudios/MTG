@@ -8,7 +8,7 @@ public class ReadyHandler extends BaseClientRequestHandler {
 
 	@Override
 	public void handleClientRequest(User user, ISFSObject params) {
-
+		trace("Entering ReadyHandler.");
 	}
 
 }
