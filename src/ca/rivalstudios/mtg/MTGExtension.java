@@ -16,21 +16,35 @@ import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.Zone;
 import com.smartfoxserver.v2.extensions.SFSExtension;
 
+/**
+ * @author Melvin Parinas
+ * @version 1.0
+ * 
+ * The main entry point into the MTG SmartFoxServer 2X server code.
+ */
 public class MTGExtension extends SFSExtension {
-		
+
+	/**
+	 * Stores the state of all the MTG games currently active.
+	 */
 	private ConcurrentHashMap<Integer, World> games = null;
+	/**
+	 * Creates are new GameController used to execute background tasks.
+	 */
 	private GameController gameController;
 
+	/**
+	 * Initialize the MTGExtension and register Request and Event handlers.
+	 */
 	@Override
 	public void init() {
-		trace("MTGMain extension started. Running version: " + Constants.SERVER_VERSION);
+		trace("MTGExtension extension started. Running version: " + Constants.SERVER_VERSION);
 		
 		games = new ConcurrentHashMap<Integer, World>();
 		
 		gameController = new GameController();
-		//gameController.start();
+		gameController.start();
 		
-		// Custom Request Handlers
 		addRequestHandler(Commands.MOVE, MoveHandler.class);
 		addRequestHandler(Commands.READY, ReadyHandler.class);
 		addRequestHandler(Commands.ATTACK, AttackHandler.class);
@@ -41,24 +55,47 @@ public class MTGExtension extends SFSExtension {
 		addEventHandler(SFSEventType.USER_DISCONNECT, UserDisconnectHandler.class);
 	}
 
+	/**
+	 * Destroy the MTGExtension and remove Request and Event handlers.
+	 */
 	@Override
 	public void destroy() {
 		trace("MTGMain destroy().");
 		super.destroy();
+
+		//TODO: Should remove both request and event handlers here.
 	}
-	
-	void startGame() {
+
+	/**
+	 * Start the game when ready.
+	 */	
+	public void startGame() {
 		// TODO:
 	}
-	
+
+	/**
+	 * Retrieve the current room.
+	 * 
+	 * @return the current room.
+	 */
 	public Room getRoom() {
 		return this.getParentRoom();
 	}
-	
+
+	/**
+	 * Retrieve the current zone.
+	 * 
+	 * @return the current zone.
+	 */
 	public Zone getZone() {
 		return this.getParentZone();
 	}
-	
+
+	/**
+	 * Retrieve the list of all currently active games.
+	 * 
+	 * @return a ConcurrentHashMap containing all active games.
+	 */
 	public ConcurrentHashMap<Integer, World> getGames() {
 		return games;
 	}
