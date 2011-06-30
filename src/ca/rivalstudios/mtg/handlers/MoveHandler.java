@@ -44,6 +44,7 @@ public class MoveHandler extends BaseClientRequestHandler {
 	
 			// Send the updates to the opponents
 			ISFSObject resObj = new SFSObject();
+			resObj.putFloat(Constants.ID, user.getId());
 			resObj.putFloat(Constants.X, px);
 			resObj.putFloat(Constants.Y, py);
 			
