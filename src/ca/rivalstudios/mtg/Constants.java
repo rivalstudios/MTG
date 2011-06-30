@@ -12,17 +12,12 @@ public class Constants {
 	 */
 	public final static String SERVER_VERSION = "1.0";
 	
-<<<<<<< HEAD
-	public final static String X = "x";
-	public final static String Y = "y";
-	public final static String ID = "i";
-=======
 	/*
 	 * Reference to an object's position.
 	 */
 	public final static String X = "x";
 	public final static String Y = "y";
->>>>>>> d2086186e13401ee0708a81976472e417944aa4f
+	public final static String ID = "i";
 
 	public static int ERROR = -1;
 	public static int OK = 1;
@@ -53,8 +48,8 @@ public class Constants {
 	/*
 	 * Map size reference values.
 	 */
-	public static int WORLD_MIN_X = -30;
-	public static int WORLD_MAX_X = 30;
-	public static int WORLD_MIN_Z = -30;
-	public static int WORLD_MAX_Z = 30;
+	public static int WORLD_MIN_X = -145;
+	public static int WORLD_MAX_X = 145;
+	public static int WORLD_MIN_Z = -145;
+	public static int WORLD_MAX_Z = 145;
 }

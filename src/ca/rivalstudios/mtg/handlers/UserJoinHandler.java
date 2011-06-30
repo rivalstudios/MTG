@@ -3,6 +3,7 @@ package ca.rivalstudios.mtg.handlers;
 import java.util.ArrayList;
 import java.util.Random;
 
+import ca.rivalstudios.mtg.Commands;
 import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
 import ca.rivalstudios.mtg.simulation.Player;
@@ -12,6 +13,8 @@ import com.smartfoxserver.v2.core.ISFSEvent;
 import com.smartfoxserver.v2.core.SFSEventParam;
 import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.User;
+import com.smartfoxserver.v2.entities.data.ISFSObject;
+import com.smartfoxserver.v2.entities.data.SFSObject;
 import com.smartfoxserver.v2.entities.variables.RoomVariable;
 import com.smartfoxserver.v2.entities.variables.SFSRoomVariable;
 import com.smartfoxserver.v2.exceptions.SFSException;
@@ -44,12 +47,19 @@ public class UserJoinHandler extends BaseServerEventHandler {
 			
 			// If the current world exists then add the new player
 			if (currWorld != null) {
-				Player p = new Player(user.getId(), user);
-				p.setGameID(currWorld.getGameID());
-				p.setX(random.nextInt(60) + Constants.WORLD_MIN_X);
-				p.setY(random.nextInt(60) + Constants.WORLD_MIN_Z);
+				Float rndX = random.nextFloat() * 290.0f + Constants.WORLD_MIN_X;
+				Float rndY = random.nextFloat() * 290.0f + Constants.WORLD_MIN_Z;
 				
+				Player p = new Player(user.getId(), user, currWorld.getGameID(), rndX, rndY);				
 				currWorld.getPlayers().put(user.getId(), p);
+				
+				ISFSObject data = new SFSObject();
+				data.putFloat(Constants.X, rndX);
+				data.putFloat(Constants.Y, rndY);
+				data.putInt(Constants.ID, user.getId());
+				
+				// Send spawn command to all users
+				send(Commands.SPAWN, data, room.getUserList());
 			}
 		}
 	}

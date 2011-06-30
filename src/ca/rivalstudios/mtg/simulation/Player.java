@@ -20,9 +20,12 @@ public class Player {
 	private int id = 0;
 	private User sfsUser = null;
 
-	public Player(int id, User sfsUser) {
+	public Player(int id, User sfsUser, int game, float x, float y) {
 		this.id = id;
 		this.sfsUser = sfsUser;
+		this.gameId = game;
+		this.x = x;
+		this.y = y;
 		
 		//this.name = name;
 		this.hp = 100.0f;

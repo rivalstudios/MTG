@@ -12,4 +12,5 @@ public class Commands {
 	public final static String START = "s";
 	public final static String WIN = "w";
 	public final static String DISCONNECT = "d";
+	public final static String SPAWN = "n";
 }
