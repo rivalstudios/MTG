@@ -52,4 +52,9 @@ public class Constants {
 	public static int WORLD_MAX_X = 145;
 	public static int WORLD_MIN_Z = -145;
 	public static int WORLD_MAX_Z = 145;
+	
+	/*
+	 * Amount of time in ms the GameController should sleep between runs
+	 */
+	public static int SLEEP_DURATION = 100;
 }

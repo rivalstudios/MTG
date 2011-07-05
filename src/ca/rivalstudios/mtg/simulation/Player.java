@@ -15,6 +15,11 @@ public class Player {
 	private float x;
 	private float y;
 	
+	private float dx;
+	private float dy;
+	
+	private boolean moving;
+	
 	private int gameId = 0;
 	
 	private int id = 0;
@@ -36,6 +41,16 @@ public class Player {
 		this.speed = 5.0f;
 		this.level = 1;
 		//this.team = team;
+		
+		this.moving = false;
+	}
+	
+	public boolean isMoving() {
+		return moving;
+	}
+	
+	public void setMoving(boolean state) {
+		moving = state;
 	}
 	
 	public String getName() {
@@ -104,5 +119,8 @@ public class Player {
 	
 	public int getGameID() {
 		return gameId;
+	}
+	
+	public void move() {
 	}
 }
