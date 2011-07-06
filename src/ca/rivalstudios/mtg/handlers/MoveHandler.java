@@ -37,10 +37,10 @@ public class MoveHandler extends BaseClientRequestHandler {
 		float px = params.getFloat("x");
 		float py = params.getFloat("y");
 		
-		if (isValidMove(px, py)) {
-			// Update the player's coordinates
-			currPlayer.setX(px);
-			currPlayer.setY(py);
+		if (isValidMove(px, py)) {			
+			currPlayer.setMoving(true);
+			currPlayer.setTargetX(px);
+			currPlayer.setTargetY(py);
 	
 			// Send the updates to the opponents
 			ISFSObject resObj = new SFSObject();

@@ -33,6 +33,22 @@ public class World {
 		return players;
 	}
 	
+	public ArrayList<Bullet> getBullets() {
+		return bullets;
+	}
+	
+	public ArrayList<Tower> getTowers() {
+		return towers;
+	}
+	
+	public ArrayList<Minion> getMinions() {
+		return minions;
+	}
+	
+	public ArrayList<Throne> getThrones() {
+		return thrones;
+	}
+	
 	public int getGameID() {
 		return id;
 	}

@@ -15,8 +15,8 @@ public class Player {
 	private float x;
 	private float y;
 	
-	private float dx;
-	private float dy;
+	private float targetX;
+	private float targetY;
 	
 	private boolean moving;
 	
@@ -109,6 +109,14 @@ public class Player {
 		this.y = y;
 	}
 	
+	public void setTargetX(float x) {
+		this.targetX = x;
+	}
+	
+	public void setTargetY(float y) {
+		this.targetY = y;
+	}
+	
 	public User getSfsUser() {
 		return sfsUser;
 	}
@@ -121,6 +129,18 @@ public class Player {
 		return gameId;
 	}
 	
-	public void move() {
+	public void UpdatePosition(float deltaTime) {
+		float dx = x - targetX;
+		float dy = y - targetY;
+		
+		// normalize the vector
+		float hyp = (float)Math.sqrt(dx * dx + dy * dy);
+		dx = dx / hyp;
+		dy = dy / hyp;
+		
+		x += dx * speed * deltaTime;
+		y += dx * speed * deltaTime;
+		
+		// send updates to other players
 	}
 }

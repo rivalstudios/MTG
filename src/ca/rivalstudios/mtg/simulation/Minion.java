@@ -55,4 +55,11 @@ public class Minion {
 	public int getTeam() {
 		return team;
 	}
+	
+	public void UpdatePosition(float deltaTime) {
+	}
+	
+	public void UpdateTarget() {
+		
+	}
 }

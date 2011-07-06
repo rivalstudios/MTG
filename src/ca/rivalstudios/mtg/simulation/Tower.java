@@ -40,4 +40,8 @@ public class Tower {
 	public float getTeam() {
 		return team;
 	}
+	
+	public void UpdateTarget() {
+		
+	}
 }
