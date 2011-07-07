@@ -25,11 +25,11 @@ public class TimeController {
 	
 	public void SetEndTime() {
 		endTime = System.currentTimeMillis();
-		deltaTime = startTime - endTime;
+		deltaTime = endTime - startTime;
 	}
 	
 	public float GetTimeDelta() {
-		return deltaTime / 1000;
+		return deltaTime / 1000.0f; // / 1000;
 	}
 	
 	public static TimeController getInstance() {

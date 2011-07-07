@@ -42,6 +42,7 @@ public class MoveHandler extends BaseClientRequestHandler {
 			currPlayer.setTargetX(px);
 			currPlayer.setTargetY(py);
 	
+			/*
 			// Send the updates to the opponents
 			ISFSObject resObj = new SFSObject();
 			resObj.putInt(Constants.ID, user.getId());
@@ -52,6 +53,7 @@ public class MoveHandler extends BaseClientRequestHandler {
 			//recipients.remove(currPlayer.getSfsUser());
 			
 			send(Commands.MOVE, resObj, recipients);
+			*/
 		} else {
 			// TODO: Handle invalid move here
 		}

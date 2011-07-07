@@ -60,10 +60,20 @@ public class MTGExtension extends SFSExtension {
 	 */
 	@Override
 	public void destroy() {
-		trace("MTGMain destroy().");
+		trace("MTGExtension destroy().");
 		super.destroy();
-
-		//TODO: Should remove both request and event handlers here.
+		
+		gameController.setTimeEventsRunning(false);
+		gameController = null;
+		
+		removeRequestHandler(Commands.MOVE);
+		removeRequestHandler(Commands.READY);
+		removeRequestHandler(Commands.ATTACK);
+		
+		removeEventHandler(SFSEventType.USER_JOIN_ROOM);
+		removeEventHandler(SFSEventType.USER_LEAVE_ROOM);
+		removeEventHandler(SFSEventType.USER_LOGOUT);
+		removeEventHandler(SFSEventType.USER_DISCONNECT);
 	}
 
 	/**

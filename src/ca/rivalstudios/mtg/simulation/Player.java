@@ -1,7 +1,18 @@
 package ca.rivalstudios.mtg.simulation;
 
-import com.smartfoxserver.v2.entities.User;
+import ca.rivalstudios.mtg.Commands;
+import ca.rivalstudios.mtg.Constants;
+import ca.rivalstudios.mtg.MTGExtension;
 
+import com.smartfoxserver.v2.entities.User;
+import com.smartfoxserver.v2.entities.data.ISFSObject;
+import com.smartfoxserver.v2.entities.data.SFSObject;
+
+/**
+ * 
+ * @author Melvin Parinas
+ * @version 1.0
+ */
 public class Player {
 	private String name;
 	private float hp;
@@ -38,7 +49,7 @@ public class Player {
 		this.damage = 5.0f;
 		this.range = 10.0f;
 		this.armour = 1.0f;
-		this.speed = 5.0f;
+		this.speed = 10.0f;
 		this.level = 1;
 		//this.team = team;
 		
@@ -129,18 +140,27 @@ public class Player {
 		return gameId;
 	}
 	
-	public void UpdatePosition(float deltaTime) {
-		float dx = x - targetX;
-		float dy = y - targetY;
+	public void UpdatePosition(float deltaTime, MTGExtension e, World w) {
+		float dx = targetX - x;
+		float dy = targetY - y;
 		
 		// normalize the vector
-		float hyp = (float)Math.sqrt(dx * dx + dy * dy);
-		dx = dx / hyp;
-		dy = dy / hyp;
+		double hyp = Math.sqrt(dx * dx + dy * dy);
+		
+		dx = (float)(dx / hyp);
+		dy = (float)(dy / hyp);
 		
 		x += dx * speed * deltaTime;
-		y += dx * speed * deltaTime;
+		y += dy * speed * deltaTime;
 		
-		// send updates to other players
+		// calculate whether we are nearby the click point, we should have a tolerance
+		// then isMoving = false
+		
+		ISFSObject obj = new SFSObject();
+		obj.putInt(Constants.ID, sfsUser.getId());
+		obj.putFloat(Constants.X, x);
+		obj.putFloat(Constants.Y, y);
+
+		e.send(Commands.MOVE, obj, sfsUser);
 	}
 }

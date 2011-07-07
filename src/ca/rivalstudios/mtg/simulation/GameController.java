@@ -3,18 +3,20 @@ package ca.rivalstudios.mtg.simulation;
 import java.util.Enumeration;
 import java.util.ListIterator;
 
+import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
 
 /**
  * Game thread controller responsible for processing all game events
  * 
- * @author Melvin
+ * @author Melvin Parinas
  * @version 1.0
  */
 public class GameController extends Thread {
 	
 	private MTGExtension extension;
 	private TimeController time;
+	private boolean timeEventsRunning = true;
 	
 	// Determine how long the previous game state took to process
 	private World currWorld; 
@@ -22,23 +24,43 @@ public class GameController extends Thread {
 	public GameController(MTGExtension extension) {
 		time = TimeController.getInstance();
 		this.extension = extension;
+		
+		extension.trace("GameController created.");
 	}
 	
 	public void run() {
-		time.SetStartTime();
+		extension.trace("GameController run()");
 		
-		// Get all current games
-		for (Enumeration<World> e = extension.getGames().elements(); e.hasMoreElements(); ) {
-			currWorld = (World) e.nextElement();
+		while (timeEventsRunning) {
+			time.SetStartTime();
 			
-			// Update the current game state
-			UpdateBullets();
-			UpdatePlayers();
-			UpdateTurrets();
-			UpdateMinions();
+			// Get all current games
+			for (Enumeration<World> e = extension.getGames().elements(); e.hasMoreElements(); ) {
+				currWorld = (World) e.nextElement();
+				
+				// Update the current game state
+				UpdateBullets();
+				UpdatePlayers();
+				UpdateTurrets();
+				UpdateMinions();
+			}
+			
+			try
+			{ 
+				Thread.sleep(Constants.SLEEP_DURATION); 
+			}
+			catch(InterruptedException e)
+			{
+				// Halt this thread
+				extension.trace("BattleFarm extension was halted");
+			}	
+			
+			time.SetEndTime();
 		}
-		
-		time.SetEndTime();
+	}
+	
+	public void setTimeEventsRunning(boolean b) {
+		timeEventsRunning = b;
 	}
 	
 	public void UpdateBullets() {
@@ -56,7 +78,7 @@ public class GameController extends Thread {
 			
 			// If the player is currently moving, then translate the player
 			if (currPlayer.isMoving()) {
-				currPlayer.UpdatePosition(time.GetTimeDelta());
+				currPlayer.UpdatePosition(time.GetTimeDelta(), extension, currWorld);
 			}
 			
 			// attack closest nearby enemies unless we are pursuing a target
