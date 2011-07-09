@@ -7,6 +7,7 @@ import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
 import ca.rivalstudios.mtg.simulation.Player;
 import ca.rivalstudios.mtg.simulation.World;
+import ca.rivalstudios.mtg.simulation.Transform;
 
 import com.smartfoxserver.v2.entities.Room;
 import com.smartfoxserver.v2.entities.User;
@@ -34,13 +35,13 @@ public class MoveHandler extends BaseClientRequestHandler {
 		Player currPlayer = world.getPlayers().get(user.getId());
 		
 		// Get the player coordinates
-		float px = params.getFloat("x");
-		float py = params.getFloat("y");
+		float x = params.getFloat("x");
+		float y = params.getFloat("y");
+		float z = params.getFloat("z");
 		
-		if (isValidMove(px, py)) {			
+		if (isValidMove(x, y, z)) {			
 			currPlayer.setMoving(true);
-			currPlayer.setTargetX(px);
-			currPlayer.setTargetY(py);
+			currPlayer.setTransform(new Transform(x, y, z));
 	
 			/*
 			// Send the updates to the opponents
@@ -62,7 +63,7 @@ public class MoveHandler extends BaseClientRequestHandler {
 	/*
 	 * Validate if the players position is a legal move.
 	 */
-	private boolean isValidMove(float x, float y) {
+	private boolean isValidMove(float x, float y, float z) {
 		return true;
 	}
 }

@@ -8,6 +8,7 @@ import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
 import ca.rivalstudios.mtg.simulation.Player;
 import ca.rivalstudios.mtg.simulation.World;
+import ca.rivalstudios.mtg.simulation.Transform;
 
 import com.smartfoxserver.v2.core.ISFSEvent;
 import com.smartfoxserver.v2.core.SFSEventParam;
@@ -48,14 +49,15 @@ public class UserJoinHandler extends BaseServerEventHandler {
 			// If the current world exists then add the new player
 			if (currWorld != null) {
 				Float rndX = random.nextFloat() * 290.0f + Constants.WORLD_MIN_X;
-				Float rndY = random.nextFloat() * 290.0f + Constants.WORLD_MIN_Z;
+				Float rndZ = random.nextFloat() * 290.0f + Constants.WORLD_MIN_Z;
 				
-				Player p = new Player(user.getId(), user, currWorld.getGameID(), rndX, rndY);				
+				Player p = new Player(user.getId(), user, currWorld.getGameID(), new Transform(rndX, 0, rndZ));				
 				currWorld.getPlayers().put(user.getId(), p);
 				
 				ISFSObject data = new SFSObject();
 				data.putFloat(Constants.X, rndX);
-				data.putFloat(Constants.Y, rndY);
+				data.putFloat(Constants.Y, 0);
+				data.putFloat(Constants.Z, rndZ);
 				data.putInt(Constants.ID, user.getId());
 				
 				// Send spawn command to all users

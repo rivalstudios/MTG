@@ -3,6 +3,7 @@ package ca.rivalstudios.mtg.simulation;
 import ca.rivalstudios.mtg.Commands;
 import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
+import ca.rivalstudios.mtg.simulation.Transform;
 
 import com.smartfoxserver.v2.entities.User;
 import com.smartfoxserver.v2.entities.data.ISFSObject;
@@ -23,11 +24,9 @@ public class Player {
 	private float speed;
 	private int level;
 	private int team;
-	private float x;
-	private float y;
-	
-	private float targetX;
-	private float targetY;
+
+	private Transform transform;
+	private Transform destTransform;
 	
 	private boolean moving;
 	
@@ -36,12 +35,12 @@ public class Player {
 	private int id = 0;
 	private User sfsUser = null;
 
-	public Player(int id, User sfsUser, int game, float x, float y) {
+	public Player(int id, User sfsUser, int game, Transform transform) {
 		this.id = id;
 		this.sfsUser = sfsUser;
 		this.gameId = game;
-		this.x = x;
-		this.y = y;
+		this.transform = transform;
+		this.destTransform = new Transform(0, 0, 0);
 		
 		//this.name = name;
 		this.hp = 100.0f;
@@ -104,28 +103,16 @@ public class Player {
 		xp = xp + amount;
 	}
 	
-	public float getX() {
-		return x;
+	public Transform getTransform() {
+		return transform;
 	}
 	
-	public float getY() {
-		return y;
+	public void setTransform(Transform t) {
+		this.transform = t;
 	}
 	
-	public void setX(float x) {
-		this.x = x;
-	}
-	
-	public void setY(float y) {
-		this.y = y;
-	}
-	
-	public void setTargetX(float x) {
-		this.targetX = x;
-	}
-	
-	public void setTargetY(float y) {
-		this.targetY = y;
+	public void setDestTransform(Transform t) {
+		destTransform = t;
 	}
 	
 	public User getSfsUser() {
@@ -141,26 +128,33 @@ public class Player {
 	}
 	
 	public void UpdatePosition(float deltaTime, MTGExtension e, World w) {
-		float dx = targetX - x;
-		float dy = targetY - y;
-		
-		// normalize the vector
-		double hyp = Math.sqrt(dx * dx + dy * dy);
-		
-		dx = (float)(dx / hyp);
-		dy = (float)(dy / hyp);
-		
-		x += dx * speed * deltaTime;
-		y += dy * speed * deltaTime;
-		
-		// calculate whether we are nearby the click point, we should have a tolerance
-		// then isMoving = false
-		
-		ISFSObject obj = new SFSObject();
-		obj.putInt(Constants.ID, sfsUser.getId());
-		obj.putFloat(Constants.X, x);
-		obj.putFloat(Constants.Y, y);
+		// Check if we are moving
+		if (moving) {
+			float dx = transform.getX() - destTransform.getX();
+			float dy = transform.getY() - destTransform.getY();
+			float dz = transform.getZ() - destTransform.getZ();
+	
+			// normalize the vector
+			float length = (float)(Math.sqrt(dx * dx + dy * dy + dz * dz));
+			dx = dx / length * speed * deltaTime;
+			dy = dy / length * speed * deltaTime;
+			dz = dz / length * speed * deltaTime;
+			
+			Transform translation = new Transform(dx, dy, dz);
+			
+			// Translate the vector
+			transform.translateBy(translation);
+			
+			// Check for collsions which may set moving to false;
+			// Check to see if we are near the click point, tolerance
+			
+			ISFSObject obj = new SFSObject();
+			obj.putInt(Constants.ID, sfsUser.getId());
+			obj.putFloat(Constants.X, transform.getX());
+			obj.putFloat(Constants.Y, transform.getY());
+			obj.putFloat(Constants.Z, transform.getZ());
 
-		e.send(Commands.MOVE, obj, sfsUser);
+			e.send(Commands.MOVE, obj, sfsUser);
+		}
 	}
 }

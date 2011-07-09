@@ -17,6 +17,7 @@ public class Constants {
 	 */
 	public final static String X = "x";
 	public final static String Y = "y";
+	public final static String Z = "z";
 	public final static String ID = "i";
 
 	public static int ERROR = -1;
