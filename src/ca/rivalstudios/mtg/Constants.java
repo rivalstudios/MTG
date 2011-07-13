@@ -40,11 +40,11 @@ public class Constants {
 	/*
 	 * Collider radiuses for all characters.
 	 */
-	public static int RADIUS_SHELL = 1;
-	public static int RADIUS_MINION = 5;
-	public static int RADIUS_PLAYER = 10;
-	public static int RADIUS_TOWER = 15;
-	public static int RADIUS_THRONE = 20;
+	public static float RADIUS_SHELL = 1.0f;
+	public static float RADIUS_MINION = 5.0f;
+	public static float RADIUS_PLAYER = 10.0f;
+	public static float RADIUS_TOWER = 15.0f;
+	public static float RADIUS_THRONE = 20.0f;
 
 	/*
 	 * Map size reference values.
@@ -58,4 +58,14 @@ public class Constants {
 	 * Amount of time in ms the GameController should sleep between runs
 	 */
 	public static int SLEEP_DURATION = 100;
+	
+	/*
+	 * Player states
+	 */
+	public static int STATE_IDLE = 0;
+	public static int STATE_MOVING = 1;
+	public static int STATE_PURSUING = 2;
+	public static int STATE_ATTACKING = 3;
+	
+	public static float MOVE_TOLERANCE = 2.0f;
 }

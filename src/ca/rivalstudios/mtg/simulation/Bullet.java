@@ -1,6 +1,8 @@
 package ca.rivalstudios.mtg.simulation;
 
 public class Bullet {
+	
+	private Transform transform;
 
 	public Bullet() {
 		
@@ -10,7 +12,16 @@ public class Bullet {
 		
 	}
 	
-	public void CheckCollision() {
+	public void CheckCollision(World world) {
 		
+	}
+	
+	public void Update(float deltaTime, World world) {
+		UpdatePosition(deltaTime);
+		CheckCollision(world);
+	}
+	
+	public Transform getTransform() {
+		return transform;
 	}
 }

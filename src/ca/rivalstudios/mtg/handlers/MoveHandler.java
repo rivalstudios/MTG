@@ -34,14 +34,14 @@ public class MoveHandler extends BaseClientRequestHandler {
 		// Get the player
 		Player currPlayer = world.getPlayers().get(user.getId());
 		
-		// Get the player coordinates
+		// Get the player click coordinates
 		float x = params.getFloat("x");
 		float y = params.getFloat("y");
 		float z = params.getFloat("z");
 		
-		if (isValidMove(x, y, z)) {			
-			currPlayer.setMoving(true);
-			currPlayer.setTransform(new Transform(x, y, z));
+		if (isValidMove(x, y, z)) {
+			currPlayer.setState(Constants.STATE_MOVING);
+			currPlayer.setDestTransform(new Transform(x, y, z));
 	
 			/*
 			// Send the updates to the opponents

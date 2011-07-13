@@ -29,7 +29,7 @@ public class TimeController {
 	}
 	
 	public float GetTimeDelta() {
-		return deltaTime / 1000.0f; // / 1000;
+		return deltaTime / 1000.0f;
 	}
 	
 	public static TimeController getInstance() {

@@ -10,6 +10,8 @@ public class Minion {
 	private float radius;
 	private int level;
 	private int team;
+	
+	private Transform transform;
 
 	public Minion(int level, int team) {
 		float multiplier = 1.0f;
@@ -26,6 +28,8 @@ public class Minion {
 		this.radius = 10.0f;
 		this.level = level;
 		this.team = team;
+		
+		// TODO: set transform (spawn point)
 	}
 	
 	public float getHp() {
@@ -56,10 +60,19 @@ public class Minion {
 		return team;
 	}
 	
+	public void Update(float deltaTime, World world) {
+		UpdatePosition(deltaTime);
+		UpdateTarget();
+	}
+	
 	public void UpdatePosition(float deltaTime) {
 	}
 	
 	public void UpdateTarget() {
 		
+	}
+	
+	public Transform getTransform() {
+		return transform;
 	}
 }

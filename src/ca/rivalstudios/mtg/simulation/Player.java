@@ -1,5 +1,9 @@
 package ca.rivalstudios.mtg.simulation;
 
+import java.util.Enumeration;
+import java.util.ListIterator;
+import java.util.concurrent.ConcurrentHashMap;
+
 import ca.rivalstudios.mtg.Commands;
 import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
@@ -22,18 +26,22 @@ public class Player {
 	private float range;
 	private float armour;
 	private float speed;
+	private long firingDelay;
 	private int level;
 	private int team;
+	
+	private int STATE; // idle, moving, pursuing, attacking
 
 	private Transform transform;
 	private Transform destTransform;
-	
-	private boolean moving;
-	
+
 	private int gameId = 0;
 	
 	private int id = 0;
 	private User sfsUser = null;
+	
+	// firing time
+	private long nextFiringTime = 0;
 
 	public Player(int id, User sfsUser, int game, Transform transform) {
 		this.id = id;
@@ -49,18 +57,11 @@ public class Player {
 		this.range = 10.0f;
 		this.armour = 1.0f;
 		this.speed = 10.0f;
+		this.firingDelay = 2000; // in MS
 		this.level = 1;
 		//this.team = team;
 		
-		this.moving = false;
-	}
-	
-	public boolean isMoving() {
-		return moving;
-	}
-	
-	public void setMoving(boolean state) {
-		moving = state;
+		STATE = Constants.STATE_IDLE;
 	}
 	
 	public String getName() {
@@ -127,9 +128,24 @@ public class Player {
 		return gameId;
 	}
 	
-	public void UpdatePosition(float deltaTime, MTGExtension e, World w) {
+	public void setState(int state) {
+		STATE = state;
+	}
+	
+	public int getState() {
+		return STATE;
+	}
+	
+	public void Update(float deltaTime, MTGExtension e, World w) {
+		UpdatePosition(deltaTime, e, w);
+		CheckCollisions(w);
+		PursueTarget();
+		AttackEnemies();
+	}
+	
+	public void UpdatePosition(float deltaTime, MTGExtension e, World w) {		
 		// Check if we are moving
-		if (moving) {
+		if (STATE == Constants.STATE_MOVING) {
 			float dx = transform.getX() - destTransform.getX();
 			float dy = transform.getY() - destTransform.getY();
 			float dz = transform.getZ() - destTransform.getZ();
@@ -145,9 +161,6 @@ public class Player {
 			// Translate the vector
 			transform.translateBy(translation);
 			
-			// Check for collsions which may set moving to false;
-			// Check to see if we are near the click point, tolerance
-			
 			ISFSObject obj = new SFSObject();
 			obj.putInt(Constants.ID, sfsUser.getId());
 			obj.putFloat(Constants.X, transform.getX());
@@ -155,6 +168,75 @@ public class Player {
 			obj.putFloat(Constants.Z, transform.getZ());
 
 			e.send(Commands.MOVE, obj, sfsUser);
+			
+			// Check to see if we are near the click point tolerance
+			if (transform.getDistanceTo(destTransform) <= Constants.MOVE_TOLERANCE) {
+				STATE = Constants.STATE_IDLE;
+			}
+		}
+	}
+	
+	public void CheckCollisions(World world) {		
+		// Checks for collisions with Players
+		for (Enumeration<Player> p = world.getPlayers().elements(); p.hasMoreElements(); ) {
+			Player currPlayer = (Player)p.nextElement();
+			
+			// Don't compare with yourself
+			if (currPlayer != this) {
+				// If we are colliding with the currPlayer then stop moving
+				if (this.isColliding(currPlayer.getTransform(), Constants.RADIUS_PLAYER)) {
+					STATE = Constants.STATE_IDLE;
+				}
+			}
+		}
+		
+		// Checks for collisions with Towers
+		for (ListIterator<Tower> t = world.getTowers().listIterator(); t.hasNext(); ) {
+			Tower currTower = (Tower)t.next();
+			
+			if (this.isColliding(currTower.getTransform(), Constants.RADIUS_TOWER)) {
+				STATE = Constants.STATE_IDLE;
+			}
+		}
+		
+		// Checks for collisions with Minions
+		for (ListIterator<Minion> m = world.getMinions().listIterator(); m.hasNext(); ) {
+			Minion currMinion = (Minion)m.next();
+			
+			if (this.isColliding(currMinion.getTransform(), Constants.RADIUS_MINION)) {
+				STATE = Constants.STATE_IDLE;
+			}
+		}
+		
+		// Checks for collisions with Thrones
+		for (ListIterator<Throne> th = world.getThrones().listIterator(); th.hasNext(); ) {
+			Throne currThrone = (Throne)th.next();
+			
+			if (this.isColliding(currThrone.getTransform(), Constants.RADIUS_THRONE)) {
+				STATE = Constants.STATE_IDLE;
+			}
+		}
+	}
+	
+	public boolean isColliding(Transform t, float radius) {
+		// Calculate the collision between two circles
+		if (this.getTransform().getDistanceTo(t) <= Constants.RADIUS_PLAYER + radius) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public void PursueTarget() {
+		
+	}
+	
+	public void AttackEnemies() {
+		if (System.currentTimeMillis() > nextFiringTime) {
+			// get the closest enemy (towers, minions, thrones, players)
+			
+			// fire bullet
+			nextFiringTime = System.currentTimeMillis() + firingDelay;
 		}
 	}
 }

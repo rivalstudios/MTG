@@ -67,8 +67,8 @@ public class GameController extends Thread {
 		for (ListIterator<Bullet> b = currWorld.getBullets().listIterator(); b.hasNext(); ) {
 			Bullet currBullet = (Bullet)b.next();
 			
-			currBullet.UpdatePosition(time.GetTimeDelta());
-			currBullet.CheckCollision();
+			currBullet.Update(time.GetTimeDelta(), currWorld);
+			//currBullet.CheckCollision(currWorld);
 		}
 	}
 
@@ -76,12 +76,8 @@ public class GameController extends Thread {
 		for (Enumeration<Player> p = currWorld.getPlayers().elements(); p.hasMoreElements(); ) {
 			Player currPlayer = (Player)p.nextElement();
 			
-			// If the player is currently moving, then translate the player
-			if (currPlayer.isMoving()) {
-				currPlayer.UpdatePosition(time.GetTimeDelta(), extension, currWorld);
-			}
-			
-			// attack closest nearby enemies unless we are pursuing a target
+			currPlayer.Update(time.GetTimeDelta(), extension, currWorld);
+			extension.trace(currPlayer.getState() + " " + System.currentTimeMillis());
 		}
 	}
 	
@@ -89,7 +85,7 @@ public class GameController extends Thread {
 		for (ListIterator<Tower> t = currWorld.getTowers().listIterator(); t.hasNext(); ) {
 			Tower currTower = (Tower)t.next();
 			
-			currTower.UpdateTarget();
+			currTower.Update(time.GetTimeDelta(), currWorld);
 		}
 	}
 	
@@ -97,8 +93,7 @@ public class GameController extends Thread {
 		for (ListIterator<Minion> m = currWorld.getMinions().listIterator(); m.hasNext(); ) {
 			Minion currMinion = (Minion)m.next();
 			
-			currMinion.UpdatePosition(time.GetTimeDelta());
-			currMinion.UpdateTarget();
+			currMinion.Update(time.GetTimeDelta(), currWorld);
 		}		
 	}
 }

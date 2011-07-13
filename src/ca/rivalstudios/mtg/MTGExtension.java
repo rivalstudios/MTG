@@ -61,10 +61,10 @@ public class MTGExtension extends SFSExtension {
 	@Override
 	public void destroy() {
 		trace("MTGExtension destroy().");
-		super.destroy();
-		
 		gameController.setTimeEventsRunning(false);
 		gameController = null;
+		
+		super.destroy();
 		
 		removeRequestHandler(Commands.MOVE);
 		removeRequestHandler(Commands.READY);

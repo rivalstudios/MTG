@@ -7,6 +7,8 @@ public class Tower {
 	private float armour;
 	private int level;
 	private int team;
+	
+	private Transform transform;
 
 	public Tower(int team) {
 		this.hp = 100.0f;
@@ -15,6 +17,8 @@ public class Tower {
 		this.armour = 1.0f;
 		this.level = 1;
 		this.team = team;
+		
+		// TODO: Set transform
 	}
 	
 	public float getHp() {
@@ -41,7 +45,15 @@ public class Tower {
 		return team;
 	}
 	
+	public void Update(float deltaTime, World world) {
+		UpdateTarget();
+	}
+	
 	public void UpdateTarget() {
 		
+	}
+	
+	public Transform getTransform() {
+		return transform;
 	}
 }
