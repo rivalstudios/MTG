@@ -60,6 +60,10 @@ public class Minion {
 		return team;
 	}
 	
+	public void subtractHP(float amount) {
+		this.hp -= amount;
+	}
+	
 	public void Update(float deltaTime, World world) {
 		UpdatePosition(deltaTime);
 		UpdateTarget();

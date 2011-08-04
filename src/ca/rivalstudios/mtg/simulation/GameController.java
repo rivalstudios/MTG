@@ -41,7 +41,7 @@ public class GameController extends Thread {
 				// Update the current game state
 				UpdateBullets();
 				UpdatePlayers();
-				UpdateTurrets();
+				UpdateTowers();
 				UpdateMinions();
 			}
 			
@@ -64,6 +64,9 @@ public class GameController extends Thread {
 	}
 	
 	public void UpdateBullets() {
+		if (currWorld.getBullets().isEmpty())
+			return;
+		
 		for (ListIterator<Bullet> b = currWorld.getBullets().listIterator(); b.hasNext(); ) {
 			Bullet currBullet = (Bullet)b.next();
 			
@@ -73,15 +76,21 @@ public class GameController extends Thread {
 	}
 
 	public void UpdatePlayers() {
+		if (currWorld.getPlayers().isEmpty())
+			return;
+		
 		for (Enumeration<Player> p = currWorld.getPlayers().elements(); p.hasMoreElements(); ) {
 			Player currPlayer = (Player)p.nextElement();
 			
 			currPlayer.Update(time.GetTimeDelta(), extension, currWorld);
-			extension.trace(currPlayer.getState() + " " + System.currentTimeMillis());
+			//extension.trace(currPlayer.getState() + " " + System.currentTimeMillis());
 		}
 	}
 	
-	public void UpdateTurrets() {
+	public void UpdateTowers() {
+		if (currWorld.getTowers().isEmpty())
+			return;
+		
 		for (ListIterator<Tower> t = currWorld.getTowers().listIterator(); t.hasNext(); ) {
 			Tower currTower = (Tower)t.next();
 			
@@ -90,6 +99,9 @@ public class GameController extends Thread {
 	}
 	
 	public void UpdateMinions() {
+		if (currWorld.getMinions().isEmpty())
+			return;
+		
 		for (ListIterator<Minion> m = currWorld.getMinions().listIterator(); m.hasNext(); ) {
 			Minion currMinion = (Minion)m.next();
 			

@@ -19,6 +19,7 @@ public class Constants {
 	public final static String Y = "y";
 	public final static String Z = "z";
 	public final static String ID = "i";
+	public final static String HP = "h";
 
 	public static int ERROR = -1;
 	public static int OK = 1;
@@ -43,8 +44,8 @@ public class Constants {
 	public static float RADIUS_SHELL = 1.0f;
 	public static float RADIUS_MINION = 5.0f;
 	public static float RADIUS_PLAYER = 10.0f;
-	public static float RADIUS_TOWER = 15.0f;
-	public static float RADIUS_THRONE = 20.0f;
+	public static float RADIUS_TOWER = 30.0f;
+	public static float RADIUS_THRONE = 50.0f;
 
 	/*
 	 * Map size reference values.

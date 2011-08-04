@@ -7,6 +7,7 @@ public class Commands {
 	public final static String HEALTH = "h";
 	public final static String POWERUP = "p";
 	public final static String FIRE = "f";
+	public final static String DEAD = "e";
 	
 	public final static String READY = "r";
 	public final static String START = "s";

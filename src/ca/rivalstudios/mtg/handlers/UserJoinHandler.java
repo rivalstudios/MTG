@@ -7,6 +7,7 @@ import ca.rivalstudios.mtg.Commands;
 import ca.rivalstudios.mtg.Constants;
 import ca.rivalstudios.mtg.MTGExtension;
 import ca.rivalstudios.mtg.simulation.Player;
+import ca.rivalstudios.mtg.simulation.Tower;
 import ca.rivalstudios.mtg.simulation.World;
 import ca.rivalstudios.mtg.simulation.Transform;
 
@@ -39,11 +40,17 @@ public class UserJoinHandler extends BaseServerEventHandler {
 			
 			World currWorld = ((MTGExtension) (getParentExtension())).getGames().get(room.getId());
 			
+			
+			
 			// If the current world does not exist then create the new world
 			if (currWorld == null) {
 				currWorld = new World(room.getId());
 				((MTGExtension) (getParentExtension())).getGames().put(room.getId(), currWorld);
 				
+				Transform transform = new Transform(0.0f, 0.0f, 0.0f);
+				Tower test = new Tower(0, transform);
+				
+				currWorld.getTowers().add(test);
 			}
 			
 			// If the current world exists then add the new player
@@ -51,7 +58,7 @@ public class UserJoinHandler extends BaseServerEventHandler {
 				Float rndX = random.nextFloat() * 290.0f + Constants.WORLD_MIN_X;
 				Float rndZ = random.nextFloat() * 290.0f + Constants.WORLD_MIN_Z;
 				
-				Player p = new Player(user.getId(), user, currWorld.getGameID(), new Transform(rndX, 0, rndZ));				
+				Player p = new Player(user.getId(), 1, user, currWorld.getGameID(), new Transform(rndX, 0, rndZ), currWorld, (MTGExtension)getParentExtension());				
 				currWorld.getPlayers().put(user.getId(), p);
 				
 				ISFSObject data = new SFSObject();

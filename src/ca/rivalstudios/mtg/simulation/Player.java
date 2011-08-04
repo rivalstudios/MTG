@@ -40,15 +40,21 @@ public class Player {
 	private int id = 0;
 	private User sfsUser = null;
 	
+	private World world;
+	private MTGExtension extension;
+	
 	// firing time
 	private long nextFiringTime = 0;
 
-	public Player(int id, User sfsUser, int game, Transform transform) {
+	public Player(int id, int team, User sfsUser, int game, Transform transform, World world, MTGExtension extension) {
 		this.id = id;
 		this.sfsUser = sfsUser;
 		this.gameId = game;
 		this.transform = transform;
 		this.destTransform = new Transform(0, 0, 0);
+		
+		this.world = world;
+		this.extension = extension;
 		
 		//this.name = name;
 		this.hp = 100.0f;
@@ -56,10 +62,10 @@ public class Player {
 		this.damage = 5.0f;
 		this.range = 10.0f;
 		this.armour = 1.0f;
-		this.speed = 10.0f;
+		this.speed = 20.0f;
 		this.firingDelay = 2000; // in MS
 		this.level = 1;
-		//this.team = team;
+		this.team = team;
 		
 		STATE = Constants.STATE_IDLE;
 	}
@@ -136,39 +142,47 @@ public class Player {
 		return STATE;
 	}
 	
-	public void Update(float deltaTime, MTGExtension e, World w) {
-		UpdatePosition(deltaTime, e, w);
-		CheckCollisions(w);
-		PursueTarget();
-		AttackEnemies();
-	}
-	
-	public void UpdatePosition(float deltaTime, MTGExtension e, World w) {		
-		// Check if we are moving
-		if (STATE == Constants.STATE_MOVING) {
-			float dx = transform.getX() - destTransform.getX();
-			float dy = transform.getY() - destTransform.getY();
-			float dz = transform.getZ() - destTransform.getZ();
-	
-			// normalize the vector
-			float length = (float)(Math.sqrt(dx * dx + dy * dy + dz * dz));
-			dx = dx / length * speed * deltaTime;
-			dy = dy / length * speed * deltaTime;
-			dz = dz / length * speed * deltaTime;
-			
-			Transform translation = new Transform(dx, dy, dz);
-			
-			// Translate the vector
-			transform.translateBy(translation);
-			
+	// THIS SHOULD BE SENT TO ALL USERS
+	// maybe there should be a command send class? otherwise, how should i do this?
+	public void subtractHP(float amount) {
+		this.hp -= amount;
+		
+		if (hp <= 0) {
 			ISFSObject obj = new SFSObject();
 			obj.putInt(Constants.ID, sfsUser.getId());
-			obj.putFloat(Constants.X, transform.getX());
-			obj.putFloat(Constants.Y, transform.getY());
-			obj.putFloat(Constants.Z, transform.getZ());
-
-			e.send(Commands.MOVE, obj, sfsUser);
+			extension.send(Commands.DEAD, obj, sfsUser);
+		} else {
+			ISFSObject obj = new SFSObject();
+			obj.putInt(Constants.ID, sfsUser.getId());
+			obj.putFloat(Constants.HP, hp);
+			extension.send(Commands.HEALTH, obj, sfsUser);
+		}
+	}
+	
+	public void Update(float deltaTime, MTGExtension e, World w) {
+		CalculateMovement(deltaTime, w);
+		UpdatePlayers(e);
+		//CheckCollisions(w, e);
+		//PursueTarget();
+		//AttackEnemies();
+	}
+	
+	public void CalculateMovement(float deltaTime, World w) {		
+		// Check if we are moving
+		if (STATE == Constants.STATE_MOVING) {
 			
+			Transform movement = new Transform(destTransform.getX() - transform.getX(), destTransform.getY() - transform.getY(), destTransform.getZ() - transform.getZ());
+			
+			movement.normalize();
+			
+			// Scale the movement vector
+			movement.scale(speed * deltaTime);
+			
+			// Translate the vector
+			transform.translateBy(movement);
+			
+			CheckCollisions(w);
+
 			// Check to see if we are near the click point tolerance
 			if (transform.getDistanceTo(destTransform) <= Constants.MOVE_TOLERANCE) {
 				STATE = Constants.STATE_IDLE;
@@ -176,7 +190,10 @@ public class Player {
 		}
 	}
 	
-	public void CheckCollisions(World world) {		
+	/** TODO: We need to keep any eye on this. There might be a scenario where we are constantly being
+	  *       push backed by everything simultaneous causing us to hop around a lot.
+	  */
+	public void CheckCollisions(World w) {		
 		// Checks for collisions with Players
 		for (Enumeration<Player> p = world.getPlayers().elements(); p.hasMoreElements(); ) {
 			Player currPlayer = (Player)p.nextElement();
@@ -184,7 +201,13 @@ public class Player {
 			// Don't compare with yourself
 			if (currPlayer != this) {
 				// If we are colliding with the currPlayer then stop moving
-				if (this.isColliding(currPlayer.getTransform(), Constants.RADIUS_PLAYER)) {
+				if (transform.isColliding(currPlayer.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_PLAYER)) {
+					Transform pushBack = new Transform(transform.getX() - currPlayer.getTransform().getX(), transform.getY() - currPlayer.getTransform().getY(), transform.getZ() - currPlayer.getTransform().getZ());
+					pushBack.normalize();	
+					float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currPlayer.getTransform());
+					pushBack.scale(pushFactor);
+					transform.translateBy(pushBack);
+					
 					STATE = Constants.STATE_IDLE;
 				}
 			}
@@ -194,7 +217,14 @@ public class Player {
 		for (ListIterator<Tower> t = world.getTowers().listIterator(); t.hasNext(); ) {
 			Tower currTower = (Tower)t.next();
 			
-			if (this.isColliding(currTower.getTransform(), Constants.RADIUS_TOWER)) {
+			// We push back the player from the tower so that their radii no longer intersect
+			if (transform.isColliding(currTower.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_TOWER)) {
+				Transform pushBack = new Transform(transform.getX() - currTower.getTransform().getX(), transform.getY() - currTower.getTransform().getY(), transform.getZ() - currTower.getTransform().getZ());
+				pushBack.normalize();	
+				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currTower.getTransform());
+				pushBack.scale(pushFactor);
+				transform.translateBy(pushBack);
+				
 				STATE = Constants.STATE_IDLE;
 			}
 		}
@@ -203,7 +233,13 @@ public class Player {
 		for (ListIterator<Minion> m = world.getMinions().listIterator(); m.hasNext(); ) {
 			Minion currMinion = (Minion)m.next();
 			
-			if (this.isColliding(currMinion.getTransform(), Constants.RADIUS_MINION)) {
+			if (transform.isColliding(currMinion.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_MINION)) {
+				Transform pushBack = new Transform(transform.getX() - currMinion.getTransform().getX(), transform.getY() - currMinion.getTransform().getY(), transform.getZ() - currMinion.getTransform().getZ());
+				pushBack.normalize();	
+				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currMinion.getTransform());
+				pushBack.scale(pushFactor);
+				transform.translateBy(pushBack);
+				
 				STATE = Constants.STATE_IDLE;
 			}
 		}
@@ -212,19 +248,26 @@ public class Player {
 		for (ListIterator<Throne> th = world.getThrones().listIterator(); th.hasNext(); ) {
 			Throne currThrone = (Throne)th.next();
 			
-			if (this.isColliding(currThrone.getTransform(), Constants.RADIUS_THRONE)) {
+			if (transform.isColliding(currThrone.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_THRONE)) {
+				Transform pushBack = new Transform(transform.getX() - currThrone.getTransform().getX(), transform.getY() - currThrone.getTransform().getY(), transform.getZ() - currThrone.getTransform().getZ());
+				pushBack.normalize();	
+				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currThrone.getTransform());
+				pushBack.scale(pushFactor);
+				transform.translateBy(pushBack);
+				
 				STATE = Constants.STATE_IDLE;
 			}
 		}
 	}
 	
-	public boolean isColliding(Transform t, float radius) {
-		// Calculate the collision between two circles
-		if (this.getTransform().getDistanceTo(t) <= Constants.RADIUS_PLAYER + radius) {
-			return true;
-		}
-		
-		return false;
+	public void UpdatePlayers(MTGExtension e) {
+		// Send new position to the user
+		ISFSObject obj = new SFSObject();
+		obj.putInt(Constants.ID, sfsUser.getId());
+		obj.putFloat(Constants.X, transform.getX());
+		obj.putFloat(Constants.Y, transform.getY());
+		obj.putFloat(Constants.Z, transform.getZ());
+		e.send(Commands.MOVE, obj, sfsUser);
 	}
 	
 	public void PursueTarget() {

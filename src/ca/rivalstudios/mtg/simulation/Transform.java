@@ -8,10 +8,15 @@ package ca.rivalstudios.mtg.simulation;
  *
  */
 public class Transform {
-
 	private float x;
 	private float y;
 	private float z;
+	
+	private float rotx;
+	private float roty;
+	private float rotz;
+	
+	private float radius;
 	
 	public Transform(float x, float y, float z) {
 		this.x = x;
@@ -19,9 +24,17 @@ public class Transform {
 		this.z = z;
 	}
 	
-	public Transform getNormalized() {
+	public void normalize() {
 		float length = (float)(Math.sqrt(x * x + y * y + z * z));
-		return new Transform(x / length, y / length, z / length);
+		x = x / length;
+		y = y / length;
+		z = z / length;
+	}
+	
+	public void scale(float factor) {
+		x = x * factor;
+		y = y * factor;
+		z = z * factor;
 	}
 	
 	public float getDistanceTo(Transform target) {
@@ -74,5 +87,15 @@ public class Transform {
 		x = t.getX();
 		y = t.getY();
 		z = t.getZ();
+	}
+	
+	public boolean isColliding(Transform t, float r1, float r2) {
+		// Calculate the collision between two circles
+		if (this.getDistanceTo(t) <= r1 + r2) {
+			
+			return true;
+		}
+		
+		return false;
 	}
 }
