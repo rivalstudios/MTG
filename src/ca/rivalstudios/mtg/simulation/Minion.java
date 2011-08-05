@@ -1,15 +1,8 @@
 package ca.rivalstudios.mtg.simulation;
 
-public class Minion {
+import ca.rivalstudios.mtg.Constants;
 
-	private float hp;
-	private float damage;
-	private float range;
-	private float armour;
-	private float speed;
-	private float radius;
-	private int level;
-	private int team;
+public class Minion extends BasicUnit{
 	
 	private Transform transform;
 
@@ -25,39 +18,12 @@ public class Minion {
 		this.range = 10.0f * multiplier;
 		this.armour = 1.0f * multiplier;
 		this.speed = 5.0f * multiplier;
-		this.radius = 10.0f;
 		this.level = level;
 		this.team = team;
 		
+		this.radius = Constants.RADIUS_MINION;
+		
 		// TODO: set transform (spawn point)
-	}
-	
-	public float getHp() {
-		return hp;
-	}
-	
-	public float getDamage() {
-		return damage;
-	}
-	
-	public float getRange() {
-		return range;
-	}
-	
-	public float getArmour() {
-		return armour;
-	}
-	
-	public float getSpeed() {
-		return speed;
-	}
-	
-	public float getLevel() {
-		return level;
-	}
-	
-	public int getTeam() {
-		return team;
 	}
 	
 	public void subtractHP(float amount) {

@@ -5,21 +5,11 @@ import java.util.ListIterator;
 
 import ca.rivalstudios.mtg.Constants;
 
-public class Tower {
-	private float hp;
-	private float damage;
-	private float range;
-	private float armour;
-	private int level;
-	private int team;
-	private long firingDelay;
+public class Tower extends BasicUnit {
 	
 	private long nextFiringTime = 0;
 	
-	private Minion targetMinion; // Might want to have minions and players inherit a common class
-	private Player targetPlayer; // so we won't need two variables
-	
-	private Transform transform;
+	private Object target;
 
 	public Tower(int team, Transform transform) {
 		this.hp = 100.0f;
@@ -29,42 +19,16 @@ public class Tower {
 		this.level = 1;
 		this.team = team;
 		
+		this.radius = Constants.RADIUS_TOWER;
+		
 		this.firingDelay = 2000;
 		
 		this.transform = transform;
 	}
 	
-	public float getHp() {
-		return hp;
-	}
-	
-	public float getDamage() {
-		return damage;
-	}
-	
-	public float getRange() {
-		return range;
-	}
-	
-	public float getArmour() {
-		return armour;
-	}
-	
-	public float getLevel() {
-		return level;
-	}
-	
-	public float getTeam() {
-		return team;
-	}
-	
 	public void Update(float deltaTime, World world) {
 		UpdateTarget(world);
 		AttackTarget();
-	}
-	
-	public void subtractHP(float amount) {
-		this.hp -= amount;
 	}
 	
 	/**
@@ -84,15 +48,12 @@ public class Tower {
 			
 				// If current minion is within range, select as target
 				if (this.transform.getDistanceTo(currMinion.getTransform()) < range) {
-					targetMinion = currMinion;
+					target = currMinion;
 					return;
 				}
 			}
 		}
-		
-		// We didn't find a suitable minion
-		targetMinion = null;
-		
+
 		for (Enumeration<Player> p = world.getPlayers().elements(); p.hasMoreElements(); ) {
 			Player currPlayer = (Player)p.nextElement();
 			
@@ -101,30 +62,23 @@ public class Tower {
 				
 				// If current player is within range, select as target
 				if (this.transform.getDistanceTo(currPlayer.getTransform()) < range) {
-					targetPlayer = currPlayer;
+					target = currPlayer;
 					return;
 				}
 			}
 		}
-		
-		// We didn't find a suitable player
-		targetPlayer = null;
 	}
 	
 	public void AttackTarget() {
 		if (System.currentTimeMillis() > nextFiringTime) {
-			if (targetMinion != null) {
-				targetMinion.subtractHP(damage);
-			} else if (targetPlayer != null) {
-				targetPlayer.subtractHP(damage);
+			if (target instanceof Player) {
+				((Player) target).subtractHP(damage);
+			} else {
+				((BasicUnit) target).subtractHP(damage);
 			}
 			
 			// next opportunity to fire bullet
 			nextFiringTime = System.currentTimeMillis() + firingDelay;
 		}
-	}
-	
-	public Transform getTransform() {
-		return transform;
 	}
 }

@@ -1,9 +1,7 @@
 package ca.rivalstudios.mtg.simulation;
 
-public class Bullet {
+public class Bullet extends BasicUnit {
 	
-	private Transform transform;
-
 	public Bullet() {
 		
 	}
@@ -19,9 +17,5 @@ public class Bullet {
 	public void Update(float deltaTime, World world) {
 		UpdatePosition(deltaTime);
 		CheckCollision(world);
-	}
-	
-	public Transform getTransform() {
-		return transform;
 	}
 }

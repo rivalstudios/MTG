@@ -44,6 +44,10 @@ public class UserJoinHandler extends BaseServerEventHandler {
 			
 			// If the current world does not exist then create the new world
 			if (currWorld == null) {
+				
+				// TODO: INITIALIZE NEW ROOM
+				// ADD TOWERS, THRONES, ETC
+				
 				currWorld = new World(room.getId());
 				((MTGExtension) (getParentExtension())).getGames().put(room.getId(), currWorld);
 				
@@ -58,7 +62,7 @@ public class UserJoinHandler extends BaseServerEventHandler {
 				Float rndX = random.nextFloat() * 290.0f + Constants.WORLD_MIN_X;
 				Float rndZ = random.nextFloat() * 290.0f + Constants.WORLD_MIN_Z;
 				
-				Player p = new Player(user.getId(), 1, user, currWorld.getGameID(), new Transform(rndX, 0, rndZ), currWorld, (MTGExtension)getParentExtension());				
+				Player p = new Player(user.getId(), 1, user, new Transform(rndX, 0, rndZ), currWorld, (MTGExtension)getParentExtension());				
 				currWorld.getPlayers().put(user.getId(), p);
 				
 				ISFSObject data = new SFSObject();

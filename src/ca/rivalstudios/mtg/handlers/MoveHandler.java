@@ -40,8 +40,8 @@ public class MoveHandler extends BaseClientRequestHandler {
 		float z = params.getFloat("z");
 		
 		if (isValidMove(x, y, z)) {
-			currPlayer.setState(Constants.STATE_MOVING);
 			currPlayer.setDestTransform(new Transform(x, y, z));
+			currPlayer.setState(Constants.STATE_MOVING);
 	
 			/*
 			// Send the updates to the opponents

@@ -18,38 +18,20 @@ import com.smartfoxserver.v2.entities.data.SFSObject;
  * @author Melvin Parinas
  * @version 1.0
  */
-public class Player {
+public class Player extends BasicUnit {
 	private String name;
-	private float hp;
-	private float damage;
-	private float xp;
-	private float range;
-	private float armour;
-	private float speed;
-	private long firingDelay;
-	private int level;
-	private int team;
-	
-	private int STATE; // idle, moving, pursuing, attacking
-
-	private Transform transform;
-	private Transform destTransform;
 
 	private int gameId = 0;
 	
 	private int id = 0;
 	private User sfsUser = null;
 	
-	private World world;
-	private MTGExtension extension;
-	
 	// firing time
 	private long nextFiringTime = 0;
 
-	public Player(int id, int team, User sfsUser, int game, Transform transform, World world, MTGExtension extension) {
+	public Player(int id, int team, User sfsUser, Transform transform, World world, MTGExtension extension) {
 		this.id = id;
 		this.sfsUser = sfsUser;
-		this.gameId = game;
 		this.transform = transform;
 		this.destTransform = new Transform(0, 0, 0);
 		
@@ -66,6 +48,7 @@ public class Player {
 		this.firingDelay = 2000; // in MS
 		this.level = 1;
 		this.team = team;
+		this.radius = Constants.RADIUS_PLAYER;
 		
 		STATE = Constants.STATE_IDLE;
 	}
@@ -74,89 +57,8 @@ public class Player {
 		return name;
 	}
 	
-	public float getHp() {
-		return hp;
-	}
-	
-	public float getDamage() {
-		return damage;
-	}
-	
-	public float getRange() {
-		return range;
-	}
-	
-	public float getArmour() {
-		return armour;
-	}
-	
-	public float getSpeed() {
-		return speed;
-	}
-	
-	public float getLevel() {
-		return level; // should be determined by XP?
-	}
-	
-	public float getTeam() {
-		return team;
-	}
-	
-	public float getXp() {
-		return xp;
-	}
-	
-	public void addXp(float amount) {
-		xp = xp + amount;
-	}
-	
-	public Transform getTransform() {
-		return transform;
-	}
-	
-	public void setTransform(Transform t) {
-		this.transform = t;
-	}
-	
-	public void setDestTransform(Transform t) {
-		destTransform = t;
-	}
-	
 	public User getSfsUser() {
 		return sfsUser;
-	}
-	
-	public void setGameID(int id) {
-		this.gameId = id;
-	}
-	
-	public int getGameID() {
-		return gameId;
-	}
-	
-	public void setState(int state) {
-		STATE = state;
-	}
-	
-	public int getState() {
-		return STATE;
-	}
-	
-	// THIS SHOULD BE SENT TO ALL USERS
-	// maybe there should be a command send class? otherwise, how should i do this?
-	public void subtractHP(float amount) {
-		this.hp -= amount;
-		
-		if (hp <= 0) {
-			ISFSObject obj = new SFSObject();
-			obj.putInt(Constants.ID, sfsUser.getId());
-			extension.send(Commands.DEAD, obj, sfsUser);
-		} else {
-			ISFSObject obj = new SFSObject();
-			obj.putInt(Constants.ID, sfsUser.getId());
-			obj.putFloat(Constants.HP, hp);
-			extension.send(Commands.HEALTH, obj, sfsUser);
-		}
 	}
 	
 	public void Update(float deltaTime, MTGExtension e, World w) {
@@ -201,10 +103,10 @@ public class Player {
 			// Don't compare with yourself
 			if (currPlayer != this) {
 				// If we are colliding with the currPlayer then stop moving
-				if (transform.isColliding(currPlayer.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_PLAYER)) {
+				if (transform.isColliding(currPlayer.getTransform(), radius, currPlayer.getRadius())) {
 					Transform pushBack = new Transform(transform.getX() - currPlayer.getTransform().getX(), transform.getY() - currPlayer.getTransform().getY(), transform.getZ() - currPlayer.getTransform().getZ());
 					pushBack.normalize();	
-					float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currPlayer.getTransform());
+					float pushFactor = radius + currPlayer.getRadius() - transform.getDistanceTo(currPlayer.getTransform());
 					pushBack.scale(pushFactor);
 					transform.translateBy(pushBack);
 					
@@ -218,10 +120,10 @@ public class Player {
 			Tower currTower = (Tower)t.next();
 			
 			// We push back the player from the tower so that their radii no longer intersect
-			if (transform.isColliding(currTower.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_TOWER)) {
+			if (transform.isColliding(currTower.getTransform(), radius, currTower.getRadius())) {
 				Transform pushBack = new Transform(transform.getX() - currTower.getTransform().getX(), transform.getY() - currTower.getTransform().getY(), transform.getZ() - currTower.getTransform().getZ());
 				pushBack.normalize();	
-				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currTower.getTransform());
+				float pushFactor = radius + currTower.getRadius() - transform.getDistanceTo(currTower.getTransform());
 				pushBack.scale(pushFactor);
 				transform.translateBy(pushBack);
 				
@@ -233,10 +135,10 @@ public class Player {
 		for (ListIterator<Minion> m = world.getMinions().listIterator(); m.hasNext(); ) {
 			Minion currMinion = (Minion)m.next();
 			
-			if (transform.isColliding(currMinion.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_MINION)) {
+			if (transform.isColliding(currMinion.getTransform(), radius, currMinion.getRadius())) {
 				Transform pushBack = new Transform(transform.getX() - currMinion.getTransform().getX(), transform.getY() - currMinion.getTransform().getY(), transform.getZ() - currMinion.getTransform().getZ());
 				pushBack.normalize();	
-				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currMinion.getTransform());
+				float pushFactor = radius + currMinion.getRadius() - transform.getDistanceTo(currMinion.getTransform());
 				pushBack.scale(pushFactor);
 				transform.translateBy(pushBack);
 				
@@ -248,10 +150,10 @@ public class Player {
 		for (ListIterator<Throne> th = world.getThrones().listIterator(); th.hasNext(); ) {
 			Throne currThrone = (Throne)th.next();
 			
-			if (transform.isColliding(currThrone.getTransform(), Constants.RADIUS_PLAYER, Constants.RADIUS_THRONE)) {
+			if (transform.isColliding(currThrone.getTransform(), radius, currThrone.getRadius())) {
 				Transform pushBack = new Transform(transform.getX() - currThrone.getTransform().getX(), transform.getY() - currThrone.getTransform().getY(), transform.getZ() - currThrone.getTransform().getZ());
 				pushBack.normalize();	
-				float pushFactor = Constants.RADIUS_PLAYER + Constants.RADIUS_TOWER - transform.getDistanceTo(currThrone.getTransform());
+				float pushFactor = radius + currThrone.getRadius() - transform.getDistanceTo(currThrone.getTransform());
 				pushBack.scale(pushFactor);
 				transform.translateBy(pushBack);
 				
@@ -261,13 +163,15 @@ public class Player {
 	}
 	
 	public void UpdatePlayers(MTGExtension e) {
-		// Send new position to the user
-		ISFSObject obj = new SFSObject();
-		obj.putInt(Constants.ID, sfsUser.getId());
-		obj.putFloat(Constants.X, transform.getX());
-		obj.putFloat(Constants.Y, transform.getY());
-		obj.putFloat(Constants.Z, transform.getZ());
-		e.send(Commands.MOVE, obj, sfsUser);
+		if (STATE == Constants.STATE_MOVING) {
+			// Send new position to the user
+			ISFSObject obj = new SFSObject();
+			obj.putInt(Constants.ID, sfsUser.getId());
+			obj.putFloat(Constants.X, transform.getX());
+			obj.putFloat(Constants.Y, transform.getY());
+			obj.putFloat(Constants.Z, transform.getZ());
+			e.send(Commands.MOVE, obj, sfsUser);
+		}
 	}
 	
 	public void PursueTarget() {
@@ -280,6 +184,22 @@ public class Player {
 			
 			// fire bullet
 			nextFiringTime = System.currentTimeMillis() + firingDelay;
+		}
+	}
+	
+	// TODO: SHOULD MOVE THIS TO THE BASICUNIT CLASS
+	public void subtractHP(float amount) {
+		this.hp -= amount;
+
+		if (hp <= 0) {
+			ISFSObject obj = new SFSObject();
+			obj.putInt(Constants.ID, sfsUser.getId());
+			extension.send(Commands.DEAD, obj, sfsUser);
+		} else {
+			ISFSObject obj = new SFSObject();
+			obj.putInt(Constants.ID, sfsUser.getId());
+			obj.putFloat(Constants.HP, hp);
+			extension.send(Commands.HEALTH, obj, sfsUser);
 		}
 	}
 }
