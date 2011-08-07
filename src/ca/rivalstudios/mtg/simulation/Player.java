@@ -26,6 +26,8 @@ public class Player extends BasicUnit {
 	private int id = 0;
 	private User sfsUser = null;
 	
+	private BasicUnit target;
+	
 	// firing time
 	private long nextFiringTime = 0;
 
@@ -42,7 +44,7 @@ public class Player extends BasicUnit {
 		this.hp = 100.0f;
 		this.xp = 0.0f;
 		this.damage = 5.0f;
-		this.range = 10.0f;
+		this.range = 50.0f;
 		this.armour = 1.0f;
 		this.speed = 20.0f;
 		this.firingDelay = 2000; // in MS
@@ -64,6 +66,9 @@ public class Player extends BasicUnit {
 	public void Update(float deltaTime, MTGExtension e, World w) {
 		CalculateMovement(deltaTime, w);
 		UpdatePlayers(e);
+		target = GetTarget(w);
+		AttackTarget();
+		
 		//CheckCollisions(w, e);
 		//PursueTarget();
 		//AttackEnemies();
@@ -178,12 +183,18 @@ public class Player extends BasicUnit {
 		
 	}
 	
-	public void AttackEnemies() {
-		if (System.currentTimeMillis() > nextFiringTime) {
-			// get the closest enemy (towers, minions, thrones, players)
+	public void AttackTarget() {
+		// If we have a target
+		if (target != null) {
+			if (System.currentTimeMillis() > nextFiringTime) {
+			//if (target instanceof Tower) {				
+				((BasicUnit)target).subtractHP(damage);
+				extension.trace(target.getHp());
+			//}
 			
-			// fire bullet
-			nextFiringTime = System.currentTimeMillis() + firingDelay;
+			// set firing delay
+				nextFiringTime = System.currentTimeMillis() + firingDelay;
+			}
 		}
 	}
 	

@@ -1,5 +1,8 @@
 package ca.rivalstudios.mtg.simulation;
 
+import java.util.Enumeration;
+import java.util.ListIterator;
+
 import com.smartfoxserver.v2.entities.data.ISFSObject;
 import com.smartfoxserver.v2.entities.data.SFSObject;
 
@@ -102,5 +105,74 @@ public class BasicUnit {
 			obj.putFloat(Constants.HP, hp);
 			extension.send(Commands.HEALTH, obj, sfsUser);
 		}*/
+	}
+	
+	/**
+	 * Gets the first enemy minion that is within range otherwise it gets the first
+	 * enemy that is the closest.
+	 * 
+	 * We can possibly change this algorithm in the future to attack the closest enemy
+	 * 
+	 * @param world The current game
+	 * @return The selected target unit
+	 */
+	public BasicUnit GetTarget(World world) {
+		for (ListIterator<Minion> m = world.getMinions().listIterator(); m.hasNext(); ) {
+			Minion currMinion = (Minion)m.next();
+			
+			// Is the minion on our team?
+			if (this.getTeam() != currMinion.getTeam()) {
+			
+				// If current minion is within range, select as target
+				if (this.transform.getDistanceTo(currMinion.getTransform()) < range) {
+					return currMinion;
+				}
+			}
+		}
+
+		for (Enumeration<Player> p = world.getPlayers().elements(); p.hasMoreElements(); ) {
+			Player currPlayer = (Player)p.nextElement();
+			
+			// Don't compare with ourself
+			if (currPlayer != this) {
+				// Is this player on our team?
+				if (this.getTeam() != currPlayer.getTeam()) {
+					
+					// If current player is within range, select as target
+					if (this.transform.getDistanceTo(currPlayer.getTransform()) < range) {
+						return currPlayer;
+					}
+				}
+			}
+		}
+		
+		for (ListIterator<Tower> t = world.getTowers().listIterator(); t.hasNext(); ) {
+			Tower currTower = (Tower)t.next();
+			
+			// Is this tower on our team?
+			if (this.getTeam() != currTower.getTeam()) {
+				
+				// If current tower is within range, select as target
+				if (this.transform.getDistanceTo(currTower.getTransform()) < range) {
+					return currTower;
+				}
+			}
+		}
+		
+		for (ListIterator<Throne> r = world.getThrones().listIterator(); r.hasNext(); ) {
+			Throne currThrone = (Throne)r.next();
+			
+			// Is this throne on our team?
+			if (this.getTeam() != currThrone.getTeam()) {
+				
+				// If current tower is within range, select as target
+				if (this.transform.getDistanceTo(currThrone.getTransform()) < range) {
+					return currThrone;
+				}
+			}
+		}
+		
+		// If we reached this point, then no target was found
+		return null;
 	}
 }
